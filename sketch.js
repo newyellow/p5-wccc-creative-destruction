@@ -1,11 +1,22 @@
-let FRAME_AWAIT_TIME = 10;
+// Here is the await time setting if you would like to slow down the animation
+let FRAME_AWAIT_TIME = 1;
+
+// Here are the steps to create the folding effect
+// 1. Generate card objects to know their own position and size
+// 2. Draw cards' front layer
+// 3. Calculate the folding angle, and erase the folded part
+// 4. Draw cards' back layer
+
+//
+// In order to make the fold one by one, there are multiple graphics used
+//
+// Also, in order to speed up the drawing, each card's front / back visual is firstly drawn on two different graphics (like a sprite sheet),
+// and getCardGraphic() is called just before each card got drawn
+
 
 let _frontLayer;
 let _backLayer;
 let _cardGraphicDisplayLayer;
-
-let _imgA;
-let _imgB;
 
 // prepare cards' visual on this graphic
 let _cardFrontGraphic;
@@ -16,11 +27,6 @@ let _tempCardImgA;
 let _tempCardImgB;
 
 let BLACK_FRAME = false;
-
-function preload() {
-  _imgA = loadImage('test-1.png');
-  _imgB = loadImage('test-2.png');
-}
 
 async function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -44,25 +50,67 @@ async function setup() {
   let _mainHue = random(0, 360);
 
   // generate rect & card datas
-  let padding = 30;
+  let padding = min(width, height) * 0.05;
   let areaX = padding;
   let areaY = padding;
   let areaW = width - padding * 2;
   let areaH = height - padding * 2;
 
   let cards = [];
-  let rectDatas = subdivideRect(areaX, areaY, areaW, areaH);
-  rectDatas.sort((a, b) => {
-    let sizeA = a.w * a.h;
-    let sizeB = b.w * b.h;
+  let rectDatas = [];
 
-    if (sizeA < sizeB)
-      return -1;
-    else if (sizeA > sizeB)
-      return 1;
-    else
-      return 0;
-  });
+  let divideType = int(random(0, 2));
+
+  // subdivision
+  if (divideType == 0) {
+    rectDatas = subdivideRect(areaX, areaY, areaW, areaH);
+
+    rectDatas.sort((a, b) => {
+      let sizeA = a.w * a.h;
+      let sizeB = b.w * b.h;
+
+      if (sizeA < sizeB)
+        return -1;
+      else if (sizeA > sizeB)
+        return 1;
+      else
+        return 0;
+    });
+  }
+  // even rects
+  else if (divideType == 1) {
+    let xCount = int(random(3, 12));
+    let yCount = int(random(3, 12));
+
+    // some special devide style
+    let sizeRandom = random();
+    if (sizeRandom < 0.2) {
+      xCount = int(random(1, 4));
+      yCount = int(random(10, 40));
+    }
+    else if (sizeRandom < 0.4) {
+      xCount = int(random(10, 40));
+      yCount = int(random(1, 4));
+    }
+
+
+    let rectWidth = areaW / xCount;
+    let rectHeight = areaH / yCount;
+
+    for (let x = 0; x < xCount; x++) {
+      for (let y = 0; y < yCount; y++) {
+        rectDatas.push(new RectData(areaX + rectWidth * x, areaY + rectHeight * y, rectWidth, rectHeight));
+      }
+    }
+
+    rectDatas.sort((a, b) => {
+      if (random() < 0.5)
+        return -1;
+      else
+        return 1;
+    });
+
+  }
 
   for (let i = 0; i < rectDatas.length; i++) {
     cards[i] = new Card(rectDatas[i].x, rectDatas[i].y, rectDatas[i].w, rectDatas[i].h);
@@ -75,9 +123,9 @@ async function setup() {
     if (colorRandom < 0.12) {
       cards[i].cardHue += 60;
     }
-    else if (colorRandom < 0.24) {
-      cards[i].cardHue += 180;
-    }
+    // else if (colorRandom < 0.24) {
+    //   cards[i].cardHue += 180;
+    // }
 
   }
 
@@ -97,24 +145,21 @@ async function setup() {
     let _seed = cards[i].seed;
 
     let _hueBack = processHue(_hue + 180);
-    let _satBack = _sat - 40;
-    let _briBack = _bri - 30;
+    let _satBack = _sat;
+    let _briBack = _bri;
+
+    if (random() < 0.12)
+      _hueBack = processHue(_hueBack + 60);
+
+    _satBack += random(-20, 20);
+    _briBack += random(-20, 20);
 
     drawGradientRect(_x, _y, _w, _h, _hue, _sat, _bri, _seed, _cardFrontGraphic);
-
+    drawGradientRect(_x, _y, _w, _h, _hueBack, _satBack, _briBack, _seed, _cardBackGraphic);
     // drawStyledRect(_x, _y, _w, _h, _hue, _sat, _bri, _seed, _cardFrontGraphic);
     // drawStyledRect(_x, _y, _w, _h, _hueBack, _sat, _bri, _seed, _cardBackGraphic);
     // drawStyledRect(_x, _y, _w, _h, _hue, _sat, _briBack, _seed, _cardBackGraphic);
     let backTypeRandom = random();
-
-    if (backTypeRandom < 0.25)
-      drawGradientRect(_x, _y, _w, _h, _hueBack, _sat, _bri, _seed, _cardBackGraphic);
-    else if (backTypeRandom < 0.5)
-      drawGradientRect(_x, _y, _w, _h, _hue, _satBack, _bri, _seed, _cardBackGraphic);
-    else if (backTypeRandom < 0.75)
-      drawGradientRect(_x, _y, _w, _h, _hue, _sat, _briBack, _seed, _cardBackGraphic);
-    else
-      drawGradientRect(_x, _y, _w, _h, _hue, 100, _bri, _seed, _cardBackGraphic);
 
 
     background(0, 0, 6);
