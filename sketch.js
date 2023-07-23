@@ -23,13 +23,15 @@ let _cardFrontGraphic;
 let _cardBackGraphic;
 
 // global use for drawing cards
-let _tempCardImgA;
-let _tempCardImgB;
+let _currentCardFront;
+let _currentCardBack;
+
+let _tempCardGraphic;
 
 let BLACK_FRAME = false;
 
 async function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(800, 1000);
 
   _frontLayer = createGraphics(width, height);
   _backLayer = createGraphics(width, height);
@@ -40,8 +42,11 @@ async function setup() {
   _cardFrontGraphic.colorMode(HSB);
   _cardBackGraphic.colorMode(HSB);
 
-  _tempCardImgA = createGraphics(width, height);
-  _tempCardImgB = createGraphics(width, height);
+  _tempCardGraphic = createGraphics(100, 100);
+  _tempCardGraphic.colorMode(HSB);
+
+  _currentCardFront = createGraphics(width, height);
+  _currentCardBack = createGraphics(width, height);
 
   colorMode(HSB);
   background(0, 0, 6);
@@ -205,6 +210,9 @@ async function setup() {
     image(_backLayer, 0, 0);
     await sleep(30);
   }
+
+  // await sleep(2000);
+  // window.location.reload();
 }
 
 function subdivideRect(_x, _y, _w, _h) {

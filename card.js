@@ -19,7 +19,7 @@ class Card {
         this.frontRemovePoints = [];
 
         this.seed = random(-100000, 100000);
-        
+
         this.cardHue = 0;
         this.cardSat = 0;
         this.cardBri = 0;
@@ -28,20 +28,19 @@ class Card {
     // put card graphic on temp graphic
     getCardGraphic() {
         // for now just use imge
-        _tempCardImgA.resizeCanvas(this.w, this.h);
-        _tempCardImgB.resizeCanvas(this.w, this.h);
+        _currentCardFront.resizeCanvas(this.w, this.h);
+        _currentCardBack.resizeCanvas(this.w, this.h);
 
-        _tempCardImgA.noStroke();
-        _tempCardImgB.noStroke();
+        _currentCardFront.noStroke();
+        _currentCardBack.noStroke();
 
-        _tempCardImgA.image(_cardFrontGraphic, -this.x, -this.y);
-        _tempCardImgB.image(_cardBackGraphic, -this.x, -this.y);
+        _currentCardFront.image(_cardFrontGraphic, -this.x, -this.y);
+        _currentCardBack.image(_cardBackGraphic, -this.x, -this.y);
     }
 
     cropCard(_ratioA, _ratioB) {
         // crop left right
-        if(this.cropType == 0)
-        {
+        if (this.cropType == 0) {
             let leftPoint = new Point(0, this.h * _ratioA);
             let rightPoint = new Point(this.w, this.h * _ratioB);
 
@@ -68,19 +67,19 @@ class Card {
             // save for the animation
             this.frontRemovePoints = Array.from(frontCropPoints);
 
-            _tempCardImgA.erase();
-            _tempCardImgA.beginShape();
+            _currentCardFront.erase();
+            _currentCardFront.beginShape();
             for (let i = 0; i < frontCropPoints.length; i++)
-                _tempCardImgA.vertex(frontCropPoints[i].x, frontCropPoints[i].y);
-            _tempCardImgA.endShape(CLOSE);
-            _tempCardImgA.noErase();
+                _currentCardFront.vertex(frontCropPoints[i].x, frontCropPoints[i].y);
+            _currentCardFront.endShape(CLOSE);
+            _currentCardFront.noErase();
 
-            _tempCardImgB.erase();
-            _tempCardImgB.beginShape();
+            _currentCardBack.erase();
+            _currentCardBack.beginShape();
             for (let i = 0; i < backCropPoints.length; i++)
-                _tempCardImgB.vertex(backCropPoints[i].x, backCropPoints[i].y);
-            _tempCardImgB.endShape(CLOSE);
-            _tempCardImgB.noErase();
+                _currentCardBack.vertex(backCropPoints[i].x, backCropPoints[i].y);
+            _currentCardBack.endShape(CLOSE);
+            _currentCardBack.noErase();
 
             // calculate back pos and angle
             let angle = getAngleDegreeFromTop(rightPoint, leftPoint);
@@ -95,8 +94,7 @@ class Card {
         }
 
         // crop top bottom
-        if(this.cropType == 1)
-        {
+        if (this.cropType == 1) {
             let topPoint = new Point(this.w * _ratioA, 0);
             let botPoint = new Point(this.w * _ratioB, this.h);
 
@@ -123,19 +121,19 @@ class Card {
             // save for the animation
             this.frontRemovePoints = Array.from(frontCropPoints);
 
-            _tempCardImgA.erase();
-            _tempCardImgA.beginShape();
+            _currentCardFront.erase();
+            _currentCardFront.beginShape();
             for (let i = 0; i < frontCropPoints.length; i++)
-                _tempCardImgA.vertex(frontCropPoints[i].x, frontCropPoints[i].y);
-            _tempCardImgA.endShape(CLOSE);
-            _tempCardImgA.noErase();
+                _currentCardFront.vertex(frontCropPoints[i].x, frontCropPoints[i].y);
+            _currentCardFront.endShape(CLOSE);
+            _currentCardFront.noErase();
 
-            _tempCardImgB.erase();
-            _tempCardImgB.beginShape();
+            _currentCardBack.erase();
+            _currentCardBack.beginShape();
             for (let i = 0; i < backCropPoints.length; i++)
-                _tempCardImgB.vertex(backCropPoints[i].x, backCropPoints[i].y);
-            _tempCardImgB.endShape(CLOSE);
-            _tempCardImgB.noErase();
+                _currentCardBack.vertex(backCropPoints[i].x, backCropPoints[i].y);
+            _currentCardBack.endShape(CLOSE);
+            _currentCardBack.noErase();
 
             // calculate back pos and angle
             let angle = getAngleDegreeFromTop(topPoint, botPoint);
@@ -150,8 +148,7 @@ class Card {
         }
 
         // corner left top
-        if(this.cropType == 2)
-        {
+        if (this.cropType == 2) {
             let cornerType = int(random(0, 4));
 
             let pointA;
@@ -239,19 +236,19 @@ class Card {
             // save for the animation
             this.frontRemovePoints = Array.from(frontCropPoints);
 
-            _tempCardImgA.erase();
-            _tempCardImgA.beginShape();
+            _currentCardFront.erase();
+            _currentCardFront.beginShape();
             for (let i = 0; i < frontCropPoints.length; i++)
-                _tempCardImgA.vertex(frontCropPoints[i].x, frontCropPoints[i].y);
-            _tempCardImgA.endShape(CLOSE);
-            _tempCardImgA.noErase();
+                _currentCardFront.vertex(frontCropPoints[i].x, frontCropPoints[i].y);
+            _currentCardFront.endShape(CLOSE);
+            _currentCardFront.noErase();
 
-            _tempCardImgB.erase();
-            _tempCardImgB.beginShape();
+            _currentCardBack.erase();
+            _currentCardBack.beginShape();
             for (let i = 0; i < backCropPoints.length; i++)
-                _tempCardImgB.vertex(backCropPoints[i].x, backCropPoints[i].y);
-            _tempCardImgB.endShape(CLOSE);
-            _tempCardImgB.noErase();
+                _currentCardBack.vertex(backCropPoints[i].x, backCropPoints[i].y);
+            _currentCardBack.endShape(CLOSE);
+            _currentCardBack.noErase();
 
             // calculate back pos and angle
             let angle = getAngleDegreeFromTop(pointA, pointB);
@@ -270,21 +267,21 @@ class Card {
         _frontLayer.push();
         _frontLayer.translate(this.x + 0.5 * this.w, this.y + 0.5 * this.h);
 
-        _frontLayer.image(_tempCardImgA, -0.5 * this.w, -0.5 * this.h);
+        _frontLayer.image(_currentCardFront, -0.5 * this.w, -0.5 * this.h);
         _frontLayer.pop();
     }
 
     removeCroppedFront() {
         _frontLayer.push();
         _frontLayer.translate(this.x, this.y);
-            
-            _frontLayer.erase();
-            _frontLayer.beginShape();
-            for (let i = 0; i < this.frontRemovePoints.length; i++)
-                _frontLayer.vertex(this.frontRemovePoints[i].x, this.frontRemovePoints[i].y);
-            _frontLayer.endShape(CLOSE);
-            _frontLayer.noErase();
-            
+
+        _frontLayer.erase();
+        _frontLayer.beginShape();
+        for (let i = 0; i < this.frontRemovePoints.length; i++)
+            _frontLayer.vertex(this.frontRemovePoints[i].x, this.frontRemovePoints[i].y);
+        _frontLayer.endShape(CLOSE);
+        _frontLayer.noErase();
+
         _frontLayer.pop();
     }
 
@@ -293,7 +290,7 @@ class Card {
         _backLayer.translate(this.x + this.backOffsetX, this.y + this.backOffsetY);
         _backLayer.rotate(radians(this.backRotation));
         _backLayer.scale(1, -1);
-        _backLayer.image(_tempCardImgB, -0.5 * this.w, -0.5 * this.h);
+        _backLayer.image(_currentCardBack, -0.5 * this.w, -0.5 * this.h);
         _backLayer.pop();
     }
 }
@@ -311,5 +308,14 @@ class Point {
     constructor(_x, _y) {
         this.x = _x;
         this.y = _y;
+    }
+}
+
+class ColorData {
+    constructor(_hue, _sat, _bri, _alpha = 1.0) {
+        this.h = _hue;
+        this.s = _sat;
+        this.b = _bri;
+        this.a = _alpha;
     }
 }
