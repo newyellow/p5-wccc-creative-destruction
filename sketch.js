@@ -13,6 +13,13 @@ let FRAME_AWAIT_TIME = 1;
 // Also, in order to speed up the drawing, each card's front / back visual is firstly drawn on two different graphics (like a sprite sheet),
 // and getCardGraphic() is called just before each card got drawn
 
+// settings
+let targetWidth = 1920;
+let targetHeight = 1080;
+let targetDensity = 1;
+let targetPadding = 200;
+let bgTransparent = false;
+// settings
 
 let _frontLayer;
 let _backLayer;
@@ -30,8 +37,19 @@ let _tempCardGraphic;
 
 let BLACK_FRAME = false;
 
+async function init() {
+  targetWidth = 1920;
+  targetHeight = 1080;
+  targetPadding = 100;
+  targetDensity = 1;
+  bgTransparent = false;
+}
+
 async function setup() {
-  createCanvas(800, 1000);
+  console.log(fxhash);
+  init();
+  createCanvas(targetWidth, targetHeight);
+  randomSeed(fxrand() * 10000000);
 
   _frontLayer = createGraphics(width, height);
   _backLayer = createGraphics(width, height);
@@ -48,14 +66,31 @@ async function setup() {
   _currentCardFront = createGraphics(width, height);
   _currentCardBack = createGraphics(width, height);
 
+  pixelDensity(targetDensity);
+  _frontLayer.pixelDensity(targetDensity);
+  _backLayer.pixelDensity(targetDensity);
+  _cardGraphicDisplayLayer.pixelDensity(targetDensity);
+
+  _cardFrontGraphic.pixelDensity(targetDensity);
+  _cardBackGraphic.pixelDensity(targetDensity);
+
+  _tempCardGraphic.pixelDensity(targetDensity);
+  _currentCardFront.pixelDensity(targetDensity);
+  _currentCardBack.pixelDensity(targetDensity);
+
   colorMode(HSB);
-  background(0, 0, 6);
+  if (bgTransparent) {
+    clear();
+  }
+  else {
+    background(0, 0, 6);
+  }
 
   // traits
   let _mainHue = random(0, 360);
 
   // generate rect & card datas
-  let padding = min(width, height) * 0.05;
+  let padding = targetPadding;
   let areaX = padding;
   let areaY = padding;
   let areaW = width - padding * 2;
@@ -204,7 +239,13 @@ async function setup() {
     cards[i].removeCroppedFront();
     cards[i].drawBack();
 
-    background(0, 0, 6);
+    if (bgTransparent) {
+      clear();
+    }
+    else {
+      background(0, 0, 6);
+    }
+
     image(_cardGraphicDisplayLayer, 0, 0);
     image(_frontLayer, 0, 0);
     image(_backLayer, 0, 0);
@@ -246,4 +287,10 @@ function subdivideRect(_x, _y, _w, _h) {
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function keyPressed(e) {
+  if (e.key == 's') {
+    save("folding-" + fxhash + ".png");
+  }
 }
